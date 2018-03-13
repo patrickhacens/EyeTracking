@@ -4,17 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EyeTrackerCompiler.Models
+namespace EyeTrackerCompiler.Domain
 {
     public class Watch
     {
         public Video Video { get; set; }
 
         public string Name { get; set; }
-
-        public FileInfo File => new FileInfo($"{Environment.CurrentDirectory}/Videos/{Name}");
-
-        public IEnumerable<WatchInfo> Info { get; set; }
 
         public Watch()
         {
@@ -23,12 +19,14 @@ namespace EyeTrackerCompiler.Models
 
         public Watch(FileInfo file)
         {
-
+            this.Name = file.Name;
         }
 
-        public Watch(string path)
+        public Watch(string path) : this(new FileInfo(path))
         {
 
         }
+
+        public List<WatchInfo> LoadInfo() => WatchInfo.Load(Video.Folder + Video.Name + "/" + Name);
     }
 }

@@ -1,40 +1,64 @@
 import * as React from 'react';
+import { RouteComponentProps } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
 
-export class NavMenu extends React.Component<{}, {}> {
-    public render() {
-        return <div className='main-nav'>
-                <div className='navbar navbar-inverse'>
-                <div className='navbar-header'>
-                    <button type='button' className='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
-                        <span className='sr-only'>Toggle navigation</span>
-                        <span className='icon-bar'></span>
-                        <span className='icon-bar'></span>
-                        <span className='icon-bar'></span>
-                    </button>
-                    <Link className='navbar-brand' to={ '/' }>EyeTrackerCompiler</Link>
-                </div>
-                <div className='clearfix'></div>
-                <div className='navbar-collapse collapse'>
-                    <ul className='nav navbar-nav'>
-                        <li>
-                            <NavLink to={ '/' } exact activeClassName='active'>
-                                <span className='glyphicon glyphicon-home'></span> Home
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink to={ '/counter' } activeClassName='active'>
-                                <span className='glyphicon glyphicon-education'></span> Counter
-                            </NavLink>
-                        </li>
-                        <li>
-                            <NavLink to={ '/fetchdata' } activeClassName='active'>
-                                <span className='glyphicon glyphicon-th-list'></span> Fetch data
-                            </NavLink>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>;
-    }
+interface NavMenuExampleState {
+	videos: Video[];
+	loading: boolean;
+}
+
+export class NavMenu extends React.Component<RouteComponentProps<{}>, NavMenuExampleState> {
+	constructor() {
+		super();
+		this.state = { videos: [], loading: true };
+
+		fetch('api/video')
+			.then(response => response.json() as Promise<Video[]>)
+			.then(data => {
+				this.setState({ videos: data, loading: false });
+			});
+	}
+
+
+	public render() {
+
+		let contents = this.state.loading
+			? <li>loading...</li>
+			: NavMenu.renderVideos(this.state.videos);
+
+		return <div className='main-nav'>
+			<div className='navbar navbar-inverse'>
+				<div className='navbar-header'>
+					<button type='button' className='navbar-toggle' data-toggle='collapse' data-target='.navbar-collapse'>
+						<span className='sr-only'>Toggle navigation</span>
+						<span className='icon-bar'></span>
+						<span className='icon-bar'></span>
+						<span className='icon-bar'></span>
+					</button>
+					<Link className='navbar-brand' to={'/'}>EyeTrackerCompiler</Link>
+				</div>
+				<div className='clearfix'></div>
+				{contents}
+
+			</div>
+		</div>;
+	}
+
+	private static renderVideos(videos: Video[]) {
+		return <div className='navbar-collapse collapse'>
+			<ul className='nav navbar-nav' >
+				{videos.map(video =>
+					<li>
+						<NavLink to={'/video'} activeClassName='active'>
+							<span className='glyphicon glyphicon-th-list'></span> video.name
+						</NavLink>
+					</li>
+				)}
+            </ul>
+		</div>;
+	}
+}
+
+interface Video {
+	name: string;
 }

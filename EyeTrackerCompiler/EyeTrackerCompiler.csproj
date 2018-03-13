@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="7.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
     <PackageReference Include="OdeToCode.AddFeatureFolders" Version="2.0.1" />
   </ItemGroup>
@@ -22,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Watch\" />
     <Folder Include="Videos\" />
     <Folder Include="Views\" />
   </ItemGroup>
