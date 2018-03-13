@@ -26,47 +26,7 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 	}
 
 	public componentDidUpdate() {
-		var d3 = Plotly.d3;
-
-		var WIDTH_IN_PERCENT_OF_PARENT = 60,
-			HEIGHT_IN_PERCENT_OF_PARENT = 80;
-
-		var gd3 = d3.select('#plot')
-			.style({
-				width: WIDTH_IN_PERCENT_OF_PARENT + '%',
-				'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
-
-				height: HEIGHT_IN_PERCENT_OF_PARENT + 'vh',
-				'margin-top': (100 - HEIGHT_IN_PERCENT_OF_PARENT) / 2 + 'vh'
-			});
-
-		var gd = gd3.node();
-
-		Plotly.plot(gd, [{
-			type: 'scatter3d',
-			mode: 'markers',
-			x: [1, 2, 3, 4],
-			y: [5, 10, 2, 8],
-			z: [3, 1, 4, 5],
-			marker: {
-				color: 'rgb(127,127,127)',
-				size: 6,
-				symbol: 'circle',
-				line: {
-					color: 'rgb(204,204,204)',
-					width: 1
-				}
-			}
-		}], {
-				title: 'Fixations',
-				font: {
-					size: 16
-				}
-			});
-
-		window.onresize = function () {
-			Plotly.Plots.resize(gd);
-		};
+		
 	}
 
 	public bringData(video: string, watch: string) {
@@ -100,8 +60,6 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 
 	private static renderFixationTable(watches: Fixation[]) {
 		return <div>
-			<div id="plot">
-			</div>
 			<div>
 				Aconteceram {watches.length} fixações
 			</div>
