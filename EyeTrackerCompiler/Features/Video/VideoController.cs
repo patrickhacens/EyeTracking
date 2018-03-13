@@ -154,12 +154,12 @@ namespace EyeTrackerCompiler.Controllers
                                     .Where(d => d.AverageEyeSpeed <= 6)
                                     .Select(d => new
                                     {
-                                        d.StartTime,
-                                        d.EndTime,
-                                        d.Duration,
-                                        d.AverageEyeSpeed,
-                                        d.X,
-                                        d.Y,
+                                        StartTime = (int)d.StartTime,
+                                        EndTime = (int)d.EndTime,
+                                        Duration = (int)d.Duration,
+                                        AverageEyeSpeed = Math.Round(d.AverageEyeSpeed,2, MidpointRounding.ToEven),
+                                        X = (int)d.X,
+                                        Y = (int)d.Y,
                                     })
                                     .ToArray();
 
@@ -191,12 +191,12 @@ namespace EyeTrackerCompiler.Controllers
                                     .Where(d => d.AverageEyeSpeed <= 6)
                                     .Select(d => new
                                     {
-                                        d.StartTime,
-                                        d.EndTime,
-                                        d.Duration,
+                                        StartTime = (int)d.StartTime,
+                                        EndTime = (int)d.EndTime,
+                                        Duration = (int)d.Duration,
                                         d.AverageEyeSpeed,
-                                        d.X,
-                                        d.Y,
+                                        X = (int)d.X,
+                                        Y = (int)d.Y,
                                     })
                                     .ToArray();
 
