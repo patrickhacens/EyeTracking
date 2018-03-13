@@ -11,10 +11,21 @@ interface VideoDataExample {
 export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDataExample> {
 	constructor(props: any) {
 		super(props);
-		console.log(props);
 		this.state = { fixations: [], loading: true };
+	}
 
-		fetch('api/video/' + props.match.params.video + '/' + props.match.params.watch + '/fixation')
+	public componentDidMount() {
+		this.bringData(this.getVideoName(), this.getWatchName());
+	}
+
+	public componentWillUpdate(props: any) {
+		if (this.getVideoName() != props.match.params.video || this.getWatchName() != props.match.params.watch) {
+			this.bringData(props.match.params.video, props.match.params.watch);
+		}
+	}
+
+	public bringData(video: string, watch: string) {
+		fetch('api/video/' + this.getVideoName() + '/' + this.getWatchName() + '/fixation')
 			.then(response => response.json() as Promise<Fixation[]>)
 			.then(data => {
 				this.setState({ fixations: data, loading: false });
@@ -36,8 +47,7 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 			: WatchPage.renderForecastsTable(this.state.fixations, this.getVideoName());
 
 		return <div>
-			<h1>Visualizações enviadas</h1>
-			<p>Segue a lista de visualizações enviadas para este video</p>
+			<h1>Fixações</h1>
 			{contents}
 		</div>;
 	}

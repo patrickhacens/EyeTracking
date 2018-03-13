@@ -9,23 +9,37 @@ interface VideoDataExample {
 }
 
 export class VideoPage extends React.Component<RouteComponentProps<{}>, VideoDataExample> {
-	constructor(props: any) {
-		super(props);
-		console.log(props);
+	constructor() {
+		super();
 		this.state = { watches: [], loading: true };
-
-		fetch('api/video/' + props.match.params.name)
-			.then(response => response.json() as Promise<Watch[]>)
-			.then(data => {
-				this.setState({ watches: data, loading: false });
-			});
 	}
 
 	public getVideoName() {
 		return (this.props.match.params as any).name;
 	}
 
+	public componentDidMount() {
+		this.bringData(this.getVideoName());
+		console.log('montou');
+	}
 
+	public componentWillUnmount() {
+		console.log('desmontou');
+	}
+
+	public componentWillUpdate(props: any) {
+		if ((this.props.match.params as any).name != props.match.params.name) {
+			this.bringData(props.match.params.name);
+		}
+	}
+
+	public bringData(videoName:string) {
+		fetch('api/video/' + videoName)
+			.then(response => response.json() as Promise<Watch[]>)
+			.then(data => {
+				this.setState({ watches: data, loading: false });
+			});
+	}
 
 	public render() {
 		let contents = this.state.loading
