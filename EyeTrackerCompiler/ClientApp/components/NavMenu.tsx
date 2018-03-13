@@ -7,7 +7,7 @@ interface NavMenuExampleState {
 	loading: boolean;
 }
 
-export class NavMenu extends React.Component<RouteComponentProps<{}>, NavMenuExampleState> {
+export class NavMenu extends React.Component<{}, NavMenuExampleState> {
 	constructor() {
 		super();
 		this.state = { videos: [], loading: true };
@@ -49,8 +49,8 @@ export class NavMenu extends React.Component<RouteComponentProps<{}>, NavMenuExa
 			<ul className='nav navbar-nav' >
 				{videos.map(video =>
 					<li>
-						<NavLink to={'/video'} activeClassName='active'>
-							<span className='glyphicon glyphicon-th-list'></span> video.name
+						<NavLink to={'/video/' + video.name} activeClassName='active'>
+							<span className='glyphicon glyphicon-th-list'></span> {video.name}
 						</NavLink>
 					</li>
 				)}
