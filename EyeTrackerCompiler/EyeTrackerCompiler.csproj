@@ -23,8 +23,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\react-plotly.d.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Videos\" />
     <Folder Include="Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TypeScriptCompile Include="ClientApp\react-plotly.d.ts" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

@@ -55,7 +55,7 @@ export class NavMenu extends React.Component<{}, NavMenuExampleState> {
 					</li>
 				)}
 				<li>
-					<NavLink to='/video/new' activeClassName='active'>
+					<NavLink to='/new/video' activeClassName='active'>
 						<span className='glyphicon glyphicon-th-list'></span> Novo Video
 					</NavLink>
 				</li>

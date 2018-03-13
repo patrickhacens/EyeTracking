@@ -2,6 +2,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router';
 import 'isomorphic-fetch';
 import { Link } from 'react-router-dom';
+import * as Plotly from 'plotly.js';
 
 interface VideoDataExample {
 	fixations: Fixation[];
@@ -24,8 +25,53 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 		}
 	}
 
+	public componentDidUpdate() {
+		var d3 = Plotly.d3;
+
+		var WIDTH_IN_PERCENT_OF_PARENT = 60,
+			HEIGHT_IN_PERCENT_OF_PARENT = 80;
+
+		var gd3 = d3.select('#plot')
+			.style({
+				width: WIDTH_IN_PERCENT_OF_PARENT + '%',
+				'margin-left': (100 - WIDTH_IN_PERCENT_OF_PARENT) / 2 + '%',
+
+				height: HEIGHT_IN_PERCENT_OF_PARENT + 'vh',
+				'margin-top': (100 - HEIGHT_IN_PERCENT_OF_PARENT) / 2 + 'vh'
+			});
+
+		var gd = gd3.node();
+
+		Plotly.plot(gd, [{
+			type: 'scatter3d',
+			mode: 'markers',
+			x: [1, 2, 3, 4],
+			y: [5, 10, 2, 8],
+			z: [3, 1, 4, 5],
+			marker: {
+				color: 'rgb(127,127,127)',
+				size: 6,
+				symbol: 'circle',
+				line: {
+					color: 'rgb(204,204,204)',
+					width: 1
+				}
+			}
+		}], {
+				title: 'Fixations',
+				font: {
+					size: 16
+				}
+			});
+
+		window.onresize = function () {
+			Plotly.Plots.resize(gd);
+		};
+	}
+
 	public bringData(video: string, watch: string) {
-		fetch('api/video/' + this.getVideoName() + '/' + this.getWatchName() + '/fixation')
+		this.setState({ fixations: [], loading: true });
+		fetch('api/video/' + video + '/' + watch + '/fixation')
 			.then(response => response.json() as Promise<Fixation[]>)
 			.then(data => {
 				this.setState({ fixations: data, loading: false });
@@ -44,39 +90,43 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 	public render() {
 		let contents = this.state.loading
 			? <p><em>Loading...</em></p>
-			: WatchPage.renderForecastsTable(this.state.fixations, this.getVideoName());
+			: WatchPage.renderFixationTable(this.state.fixations);
 
 		return <div>
-			<h1>Fixações</h1>
+			<h1>Fixações de {this.getWatchName()}</h1>
 			{contents}
 		</div>;
 	}
 
-	private static renderForecastsTable(watches: Fixation[], videoname: string) {
-		return <table className='table'>
-			<thead>
-				<tr>
-					<th>Inicio</th>
-					<th>Termino</th>
-					<th>Duração</th>
-					<th>Velocidade média do olho</th>
-					<th>X</th>
-					<th>Y</th>
-				</tr>
-			</thead>
-			<tbody>
-				{watches.map(watch =>
-					<tr key={watch.startTime}>
-						<td>{watch.startTime}</td>
-						<td>{watch.endTime}</td>
-						<td>{watch.duration}</td>
-						<td>{watch.averageEyeSpeed}</td>
-						<td>{watch.x}</td>
-						<td>{watch.y}</td>
+	private static renderFixationTable(watches: Fixation[]) {
+		return <div>
+			<div id="plot">
+			</div>
+			<table className='table'>
+				<thead>
+					<tr>
+						<th>Inicio</th>
+						<th>Termino</th>
+						<th>Duração</th>
+						<th>Velocidade média do olho</th>
+						<th>X</th>
+						<th>Y</th>
 					</tr>
-				)}
-			</tbody>
-		</table>;
+				</thead>
+				<tbody>
+					{watches.map(watch =>
+						<tr key={watch.startTime}>
+							<td>{watch.startTime}</td>
+							<td>{watch.endTime}</td>
+							<td>{watch.duration}</td>
+							<td>{watch.averageEyeSpeed}</td>
+							<td>{watch.x}</td>
+							<td>{watch.y}</td>
+						</tr>
+					)}
+				</tbody>
+			</table>
+		</div>;
 	}
 }
 

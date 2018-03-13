@@ -6,12 +6,15 @@ import { Link } from 'react-router-dom';
 interface VideoDataExample {
 	watches: Watch[];
 	loading: boolean;
+	file: any;
 }
 
 export class VideoPage extends React.Component<RouteComponentProps<{}>, VideoDataExample> {
 	constructor() {
 		super();
-		this.state = { watches: [], loading: true };
+		this.state = { watches: [], loading: true, file: null };
+		this.onSubmit = this.onSubmit.bind(this);
+		this.onChangeFile = this.onChangeFile.bind(this);
 	}
 
 	public getVideoName() {
@@ -20,20 +23,16 @@ export class VideoPage extends React.Component<RouteComponentProps<{}>, VideoDat
 
 	public componentDidMount() {
 		this.bringData(this.getVideoName());
-		console.log('montou');
 	}
 
-	public componentWillUnmount() {
-		console.log('desmontou');
-	}
 
 	public componentWillUpdate(props: any) {
-		if ((this.props.match.params as any).name != props.match.params.name) {
+		if (props.match.params.name != this.getVideoName()) {
 			this.bringData(props.match.params.name);
 		}
 	}
 
-	public bringData(videoName:string) {
+	public bringData(videoName: string) {
 		fetch('api/video/' + videoName)
 			.then(response => response.json() as Promise<Watch[]>)
 			.then(data => {
@@ -44,7 +43,7 @@ export class VideoPage extends React.Component<RouteComponentProps<{}>, VideoDat
 	public render() {
 		let contents = this.state.loading
 			? <p><em>Loading...</em></p>
-			: VideoPage.renderForecastsTable(this.state.watches, this.getVideoName());
+			: this.renderForecastsTable(this.state.watches, this.getVideoName());
 
 		return <div>
 			<h1>Visualizações enviadas</h1>
@@ -53,23 +52,60 @@ export class VideoPage extends React.Component<RouteComponentProps<{}>, VideoDat
 		</div>;
 	}
 
-	private static renderForecastsTable(watches: Watch[], videoname: string) {
-		return <table className='table'>
-			<thead>
-				<tr>
-					<th>Nome</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				{watches.map(watch =>
-					<tr key={watch.name}>
-						<td>{watch.name}</td>
-						<td><Link to={'/video/' + videoname + '/' + watch.name} >Visualizar os dados</Link></td>
+	public onChangeFile(e: any) {
+		this.setState({ file: e.target.files[0], watches: this.state.watches, loading: this.state.loading });
+	}
+
+	public onSubmit(e: any) {
+		debugger;
+		e.preventDefault();
+		this.fileUpload(this.state.file)
+			.then((response: any) => {
+				this.bringData(this.getVideoName());
+			});
+	}
+
+	private fileUpload(file: any) {
+		const formData = new FormData();
+		formData.append('file', file);
+		return fetch('/api/video/' + this.getVideoName(),
+			{
+				method: 'POST',
+				body: formData,
+				//headers: {
+				//	'content-type': 'multipart/form-data'
+				//}
+			});
+	}
+
+	private renderForecastsTable(watches: Watch[], videoname: string) {
+		return <div>
+			<table className='table'>
+				<thead>
+					<tr>
+						<th>Nome</th>
+						<th></th>
 					</tr>
-				)}
-			</tbody>
-		</table>;
+				</thead>
+				<tbody>
+					{watches.map(watch =>
+						<tr key={watch.name}>
+							<td>{watch.name}</td>
+							<td><Link to={'/video/' + videoname + '/' + watch.name} >Visualizar os dados</Link></td>
+						</tr>
+					)}
+					<tr>
+					</tr>
+				</tbody>
+			</table>
+			<div>
+				<form onSubmit={this.onSubmit}>
+					Nova visualização
+							<input type='file' onChange={this.onChangeFile} />
+					<button type='submit'>Enviar</button>
+				</form>
+			</div>
+		</div>;
 	}
 }
 
