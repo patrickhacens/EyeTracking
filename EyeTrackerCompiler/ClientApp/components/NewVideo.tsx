@@ -39,9 +39,9 @@ export class NewVideo extends React.Component<RouteComponentProps<{}>, NewVideoD
 		return <div>
 			<form onSubmit={this.handleSubmit}>
 				<label>
-					Nome do Video:
-					<input type='text' value={this.state.value} onChange={this.handleChange} />
-				</label>
+					<span>Adicione um novo video</span>:
+				</label><br/>
+					<input type='text' placeholder='Nome do video' value={this.state.value} onChange={this.handleChange} />
 				<input type='submit' value='Submit' />
 			</form>
 		</div>;

@@ -102,6 +102,9 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 		return <div>
 			<div id="plot">
 			</div>
+			<div>
+				Aconteceram {watches.length} fixações
+			</div>
 			<table className='table'>
 				<thead>
 					<tr>
