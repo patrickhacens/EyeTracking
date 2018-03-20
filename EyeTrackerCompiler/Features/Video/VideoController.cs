@@ -151,13 +151,14 @@ namespace EyeTrackerCompiler.Controllers
 
             var filteredResults = results
                                     .Where(d => d.Duration > 100)
-                                    .Where(d => d.AverageEyeSpeed <= 6)
+                                    .Where(d => d.Duration < 800)
+                                    .Where(d => d.AverageEyeSpeed <= this.FixationThreshold)
                                     .Select(d => new
                                     {
                                         StartTime = (int)d.StartTime,
                                         EndTime = (int)d.EndTime,
                                         Duration = (int)d.Duration,
-                                        AverageEyeSpeed = Math.Round(d.AverageEyeSpeed,2, MidpointRounding.ToEven),
+                                        AverageEyeSpeed = Math.Round(d.AverageEyeSpeed, 2, MidpointRounding.ToEven),
                                         X = (int)d.X,
                                         Y = (int)d.Y,
                                     })
@@ -188,6 +189,7 @@ namespace EyeTrackerCompiler.Controllers
 
             var filteredResults = results
                                     .Where(d => d.Duration > 100)
+                                    .Where(d => d.Duration < 800)
                                     .Where(d => d.AverageEyeSpeed <= 6)
                                     .Select(d => new
                                     {

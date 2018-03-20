@@ -20,7 +20,13 @@ namespace EyeTrackerCompiler.Domain
 
         public double Y { get; set; }
 
-        public double GetSpeed(WatchInfo info) => Math.Abs((this.X - info.X) + (this.Y - info.Y)) / Timegap;
+        public double Xm => X * 0.264;
+
+        public double Ym => Y * 0.264;
+
+        public double GetDistance(WatchInfo info) => Math.Sqrt(Math.Pow(Math.Abs(this.Xm - info.Xm), 2) + Math.Pow(Math.Abs(this.Ym - info.Ym), 2));
+
+        public double GetSpeed(WatchInfo info) => (Math.Atan(GetDistance(info) / 10.0d / 570.0d) * 180 / Math.PI) / ((this.Time - info.Time) / 1000);
 
         public static List<WatchInfo> Load(string path)
         {
@@ -37,7 +43,7 @@ namespace EyeTrackerCompiler.Domain
             using (CsvReader reader = new CsvReader(txReader, conf))
             {
                 return reader.GetRecords<WatchInfo>()
-                    .OrderBy(d=>d.Time)
+                    .OrderBy(d => d.Time)
                     .ToList();
             }
         }
