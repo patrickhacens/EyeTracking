@@ -168,6 +168,27 @@ namespace EyeTrackerCompiler.Controllers
         }
 
 
+        [Route("{video}/{watch}/timepoint")]
+        [HttpGet]
+        public IActionResult GetTimePoints(string video, string watch)
+        {
+            FileInfo f = new FileInfo(Video.Folder + video + "/" + watch);
+            Watch watchObject = new Watch(f.FullName)
+            {
+                Video = new Video()
+                {
+                    Name = video
+                }
+            };
+
+            var records = watchObject.LoadInfo();
+            if (!records.Any()) return NotFound();
+
+            List<WatchInfoSpeed> list = WatchInfoSpeed.Compile(watchObject, records);
+
+            return Ok(list);
+        }
+
         [Route("{video}/{watch}/fixation/csv")]
         [HttpGet]
         public IActionResult GetFixationsCsv(string video, string watch)

@@ -5,13 +5,19 @@ import { Link } from 'react-router-dom';
 
 interface VideoDataExample {
 	fixations: Fixation[];
+	timePoints: TimePoint[];
 	loading: boolean;
 }
 
 export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDataExample> {
+
+	public canvas: HTMLCanvasElement;
+
 	constructor(props: any) {
 		super(props);
-		this.state = { fixations: [], loading: true };
+		this.state = { fixations: [], timePoints: [], loading: true };
+		this.startVisualization = this.startVisualization.bind(this);
+		this.step = this.step.bind(this);
 	}
 
 	public componentDidMount() {
@@ -25,7 +31,7 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 	}
 
 	public componentDidUpdate() {
-		
+
 	}
 
 	public bringData(video: string, watch: string) {
@@ -33,7 +39,13 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 		fetch('api/video/' + video + '/' + watch + '/fixation')
 			.then(response => response.json() as Promise<Fixation[]>)
 			.then(data => {
-				this.setState({ fixations: data, loading: false });
+				this.setState({ fixations: data, timePoints: this.state.timePoints, loading: false });
+			});
+
+		fetch('api/video/' + video + '/' + watch + '/timepoint')
+			.then(response => response.json() as Promise<TimePoint[]>)
+			.then(data => {
+				this.setState({ fixations: this.state.fixations, timePoints: data, loading: this.state.loading });
 			});
 	}
 
@@ -45,6 +57,44 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 		return (this.props.match.params as any).watch;
 	}
 
+	private running = false;
+	private quoteThreadQuote: any;
+	private passedTime = 0;
+
+	public startVisualization() {
+		this.running = true;
+		this.quoteThreadQuote = setInterval(this.step, 16);
+	}
+
+	public step() {
+		console.log("step");
+		this.passedTime += 16;
+		if (!this.running) {
+			clearInterval(this.quoteThreadQuote);
+		}
+		var itens = this.state.timePoints.filter((f) => Math.abs(this.passedTime - f.time) < 3000 && f.time <= this.passedTime);
+		var ctx = this.canvas.getContext("2d")!;
+		ctx.clearRect(0, 0, 480, 240);
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = "black";
+
+		if (itens.length > 0) {
+			debugger
+		}
+
+		for (var i = 0; i < itens.length; i++) {
+			ctx.beginPath();
+			var alpha = (1 - (Math.abs(this.passedTime - itens[i].time) / 3000)) * 0.7;
+			ctx.fillStyle = "rgba(32, 45, 21, " + alpha + ")";
+			var item = itens[i];
+			
+			var xc = item.x * 480 / 1920;
+			var yc = item.y * 240 / 1080;
+			ctx.arc(xc, yc, 5, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+	}
+
 
 	public render() {
 		let contents = this.state.loading
@@ -53,6 +103,10 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 
 		return <div>
 			<h1>Fixações de {this.getWatchName()}</h1>
+			<canvas id="canvas" ref={(ref) => this.canvas = ref!} width="480px" height="240px"></canvas>
+
+
+			<button onClick={this.startVisualization}>Visualizar sequencia</button>
 			{contents}
 		</div>;
 	}
@@ -97,4 +151,10 @@ interface Fixation {
 	averageEyeSpeed: number;
 	x: number;
 	y: number;
+}
+
+interface TimePoint {
+	x: number;
+	y: number;
+	time: number;
 }
