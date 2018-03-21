@@ -12,12 +12,13 @@ interface VideoDataExample {
 export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDataExample> {
 
 	public canvas: HTMLCanvasElement;
+	public video: HTMLVideoElement;
 
 	constructor(props: any) {
 		super(props);
 		this.state = { fixations: [], timePoints: [], loading: true };
-		this.startVisualization = this.startVisualization.bind(this);
 		this.step = this.step.bind(this);
+		this.start = this.start.bind(this);
 	}
 
 	public componentDidMount() {
@@ -57,23 +58,26 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 		return (this.props.match.params as any).watch;
 	}
 
-	private running = false;
-	private quoteThreadQuote: any;
-	private passedTime = 0;
+	get passedTime():number {
+		return this.video.currentTime * 1000;
+	}
+	get running(): boolean {
+		return !(this.video.paused || this.video.ended);
+	}
 
-	public startVisualization() {
-		this.running = true;
-		this.quoteThreadQuote = setInterval(this.step, 16);
+	private thread: any;
+
+	public start() {
+		this.thread = setInterval(this.step, 16);
 	}
 
 	public step() {
-		this.passedTime += 16;
 		if (!this.running) {
-			clearInterval(this.quoteThreadQuote);
+			clearInterval(this.thread);
 		}
 		var itens = this.state.timePoints.filter((f) => Math.abs(this.passedTime - f.time) < 3000 && f.time <= this.passedTime);
 		var ctx = this.canvas.getContext("2d")!;
-		ctx.clearRect(0, 0, 480, 240);
+		ctx.clearRect(0, 0, 480, 270);
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = "black";
 
@@ -84,7 +88,7 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 			var item = itens[i];
 			
 			var xc = item.x * 480 / 1920;
-			var yc = item.y * 240 / 1080;
+			var yc = item.y * 270 / 1080;
 			ctx.arc(xc, yc, 5, 0, 2 * Math.PI);
 			ctx.fill();
 		}
@@ -98,10 +102,22 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 
 		return <div>
 			<h1>Fixações de {this.getWatchName()}</h1>
-			<canvas id="canvas" ref={(ref) => this.canvas = ref!} width="480px" height="240px"></canvas>
-
-
-			<button onClick={this.startVisualization}>Visualizar sequencia</button>
+			<div>
+				<canvas id="canvas"
+					ref={(ref) => this.canvas = ref!}
+					className="abs"
+					width="480px"
+					height="270px"
+				/>
+				<video id="video"
+					ref={(ref) => this.video = ref!}
+					src="/Videos/Video 1.mp4"
+					width="480px"
+					height="270px"
+					controls={true}
+					onPlay={this.start}
+				/>
+			</div>
 			{contents}
 		</div>;
 	}

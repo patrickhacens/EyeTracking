@@ -64,3 +64,8 @@
         text-overflow: ellipsis;
     }
 }
+
+.abs {
+	position: absolute;
+	pointer-events:none;
+}
