@@ -67,7 +67,6 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 	}
 
 	public step() {
-		console.log("step");
 		this.passedTime += 16;
 		if (!this.running) {
 			clearInterval(this.quoteThreadQuote);
@@ -77,10 +76,6 @@ export class WatchPage extends React.Component<RouteComponentProps<{}>, VideoDat
 		ctx.clearRect(0, 0, 480, 240);
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = "black";
-
-		if (itens.length > 0) {
-			debugger
-		}
 
 		for (var i = 0; i < itens.length; i++) {
 			ctx.beginPath();
